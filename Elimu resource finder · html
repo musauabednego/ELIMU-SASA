@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elimu Studio · Resource Finder</title>
+<style>
+:root{--bg:#f6f5ef;--card:#fff;--ink:#1d2a24;--mut:#5f6d66;--line:#dfe3da;--acc:#0e7a55;--on:#fff;--soft:#e2f2ea;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111815;--card:#1a2420;--ink:#e9efeb;--mut:#9eada5;--line:#2b3832;--acc:#41d1a0;--on:#062418;--soft:#173229;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111815;--card:#1a2420;--ink:#e9efeb;--mut:#9eada5;--line:#2b3832;--acc:#41d1a0;--on:#062418;--soft:#173229;color-scheme:dark}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+.logo{font-weight:700;font-size:18px}.logo b{color:var(--acc)}.sp{flex:1}
+#who{display:flex;gap:10px;align-items:center}
+.badge{background:var(--soft);color:var(--acc);padding:3px 12px;border-radius:99px;font-size:13px;font-weight:600}
+main{max-width:1100px;margin:0 auto;padding:20px;display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){main.app{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}aside{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));align-self:start}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.login{max-width:680px;margin:30px auto;width:100%}.login h1{font-size:22px;margin:0 0 4px}
+h2{font-size:16px;margin:0 0 10px}
+button{font:inherit;cursor:pointer}
+.step{margin-bottom:18px}.step:last-child{margin-bottom:0}
+.lbl{display:flex;gap:8px;align-items:center;font-weight:600;margin-bottom:8px;flex-wrap:wrap}
+.n{width:22px;height:22px;border-radius:50%;background:var(--acc);color:var(--on);font-size:12px;display:grid;place-items:center}
+.hint{color:var(--mut);font-size:13px;font-weight:400}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 14px;border-radius:99px}
+.chip[aria-pressed="true"]{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.svcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin:12px 0}
+.svc{text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:12px;border-radius:12px}
+.svc[aria-pressed="true"]{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
+.svc span{display:block;color:var(--mut);font-size:13px}
+.tag{display:inline-block;margin-top:6px;font-size:11px;font-style:normal;background:var(--soft);color:var(--acc);border-radius:6px;padding:1px 8px}
+.tp{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+.tp label,.cb{display:flex;gap:8px;align-items:center}
+.subs{display:flex;flex-wrap:wrap;gap:6px 18px;margin:8px 0 0 4px}
+.row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px}
+select,textarea,input[type=file]{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit}
+textarea{width:100%;margin-top:8px}
+.ghost{background:none;border:1px solid var(--line);color:var(--ink);padding:5px 12px;border-radius:8px;font-size:13px}
+.cta{background:var(--acc);color:var(--on);border:0;padding:8px 14px;border-radius:10px;font-weight:600}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px}
+.crumb{background:var(--soft);color:var(--acc);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+code{font-size:12px;color:var(--acc);font-weight:600}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto;font-size:12px;margin:6px 0 0;max-height:240px}
+.res{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;max-width:90%;font-size:14px}
+#toast[hidden]{display:none}
+</style>
+</head>
+<body>
+<header><div class="logo">Elimu<b>Studio</b></div><div class="sp"></div><div id="who"></div></header>
+<main></main>
+<div id="toast" role="status" hidden></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const P=s=>s.split(';').map(t=>{const[a,b]=t.split(':');return{n:a,s:b.split(',')}});
+/* SAMPLE curriculum data: replace with your curriculum API. Shape: curriculum > class > term > [{n:topic, s:[subtopics]}] */
+const D={
+cbc:{'Grade 10':{
+1:P('Exponents and Radicals:Laws of exponents,Radicals,Rationalising denominators;Quadratic Expressions and Equations:Expansion and factorisation,Solving by factorisation,Completing the square'),
+2:P('Commercial Arithmetic:Rates and ratios,Proportions,Percentage change;Coordinates and Graphs:Gradient of a line,Linear graphs,Simultaneous equations'),
+3:P('Surface Area and Volume:Prisms and pyramids,Cylinders and cones;Statistics and Probability:Data representation,Measures of central tendency,Probability of events')}},
+old:{'Form 3':{
+1:P('Quadratic Expressions and Equations II:Factorisation,Quadratic formula,Graphs of quadratics;Approximations and Errors:Absolute and relative error,Percentage error'),
+2:P('Trigonometry II:Trigonometric ratios,Graphs of sine and cosine;Commercial Arithmetic II:Compound interest,Hire purchase,Currency exchange'),
+3:P('Circles, Chords and Tangents:Chord properties,Tangent properties,Cyclic quadrilaterals;Surds:Simplifying surds,Rationalising denominators')},
+'Form 4':{
+1:P('Matrices and Transformations:Matrix operations,Inverse of a matrix,Transformations;Statistics II:Grouped data,Ogive and quartiles,Standard deviation'),
+2:P('Loci:Constant distance loci,Intersecting loci;Trigonometry III:Sine and cosine rules,Area of a triangle'),
+3:P('Linear Programming:Forming inequalities,Feasible region,Optimisation;Vectors II:Position vectors,Collinearity')}}};
+const CN={cbc:'CBC',old:'8-4-4'},RN={L:'Learner',T:'Teacher',S:'School'};
+const SUBJ=['Mathematics','English','Kiswahili','Integrated Science','Business Studies'];
+/* r = roles allowed (L/T/S), s = filter steps in order, t = tag. Enforce roles on the server too. */
+const SV=[
+{id:'notes',n:'Notes',d:'Topic and subtopic notes',r:'LTS',s:'cur cls subject term topics subs',t:'PDF'},
+{id:'exams',n:'Exams',d:'Practice papers by exam type',r:'L',s:'cur cls subject term year etype topics',t:'PDF'},
+{id:'marking',n:'Marking schemes',d:'Mark allocation and full working',r:'L',s:'cur cls subject term year etype topics',t:'PDF'},
+{id:'aiquiz',n:'AI quizzes and exams',d:'Generated for you, marked by AI with a score',r:'L',s:'cur cls subject term topics cfg',t:'AI'},
+{id:'ainotes',n:'AI-generated notes',d:'Custom notes on chosen topics',r:'TS',s:'cur cls subject term topics subs',t:'AI · PDF'},
+{id:'scheme',n:'Schemes of work',d:'Termly schemes, printable',r:'TS',s:'cur cls subject term year topics subs',t:'PDF'},
+{id:'lesson',n:'Lesson plans',d:'One plan per subtopic, printable',r:'TS',s:'cur cls subject term year topics subs',t:'PDF'},
+{id:'aiexam',n:'AI exams and marking schemes',d:'Generate a paper with its marking scheme',r:'TS',s:'cur cls subject term etype topics cfg',t:'AI · PDF'},
+{id:'analysis',n:'Exam processing and analysis',d:'Upload marks for all learners, get full analysis',r:'S',s:'cur cls term year etype upload',t:'School'},
+{id:'sms',n:'Bulk SMS',d:'Message parents and learners',r:'S',s:'aud cls2 msg',t:'School'}];
+const EP={notes:'GET /api/notes',exams:'GET /api/exams',marking:'GET /api/marking-schemes',scheme:'GET /api/schemes',lesson:'GET /api/lesson-plans',aiquiz:'POST /api/ai/quiz',ainotes:'POST /api/ai/notes',aiexam:'POST /api/ai/exam',analysis:'POST /api/school/analysis',sms:'POST /api/school/sms'};
+const TPL=[['Fee reminder','Dear parent, the school fees balance is due by [date]. Kindly clear it to avoid inconvenience.'],['Results ready','Dear parent, the [term] exam results for [name] are ready. Please log in or visit the school to view them.'],['Meeting','Dear parent, you are invited to a parents’ meeting on [date] at [time].']];
+const LB={svc:'Service',cur:'Curriculum',cls:'Class',subject:'Subject',term:'Term',year:'Year',etype:'Exam type',subs:'Subtopics',cfg:'Paper settings',upload:'Upload marks',aud:'Send to',cls2:'Class',msg:'Message'};
+const HT={cur:'CBC or 8-4-4',subs:'pick the lessons you need',upload:'CSV or Excel, one row per learner'};
+const Z={cur:null,cls:null,subject:null,term:null,year:null,etype:null,topics:[],subs:[],file:null,aud:null,cls2:null};
+const init=()=>({role:null,svc:null,cur:null,cls:null,subject:null,term:null,year:null,etype:null,topics:[],subs:[],cfg:{n:20,d:'Mixed',ms:true},file:null,aud:null,cls2:null,msg:''});
+let A=init(),tm;
+const svc=()=>SV.find(x=>x.id==A.svc);
+const steps=()=>['svc'].concat(A.svc?svc().s.split(' '):[]);
+const isExam=()=>['exams','marking','aiquiz','aiexam'].includes(A.svc);
+const tl=()=>A.subject=='Mathematics'&&A.cur&&A.cls?(D[A.cur][A.cls][A.term]||[]):[];
+const lab=k=>k=='topics'?(isExam()?'Topics to be tested':'Topics'):LB[k];
+const done=k=>k=='topics'||k=='subs'?A[k].length>0:k=='cfg'?true:k=='msg'?A.msg.trim().length>0:k=='upload'?!!A.file:A[k]!=null;
+
+const chips=(k,a)=>'<div class="chips" role="group">'+a.map(([v,t])=>`<button class="chip" aria-pressed="${A[k]==v}" data-k="${k}" data-v="${esc(v)}" data-f="${k}:${esc(v)}">${esc(t)}</button>`).join('')+'</div>';
+const cb=(a,v,t)=>`<label class="cb"><input type="checkbox" data-a="${a}" data-v="${esc(v)}" data-f="${a}:${esc(v)}" ${A[a].includes(v)?'checked':''}> ${esc(t)}</label>`;
+const all=k=>`<p style="margin:0 0 8px"><button class="ghost" data-all="${k}">Select all / none</button></p>`;
+
+function body(k){
+ if(k=='svc')return '<div class="svcs">'+SV.filter(s=>s.r.includes(A.role)).map(s=>`<button class="svc" aria-pressed="${A.svc==s.id}" data-k="svc" data-v="${s.id}" data-f="svc:${s.id}"><b>${s.n}</b><span>${s.d}</span><i class="tag">${s.t}</i></button>`).join('')+'</div>';
+ if(k=='cur')return chips('cur',[['cbc','CBC'],['old','8-4-4']]);
+ if(k=='cls')return chips('cls',Object.keys(D[A.cur]).map(c=>[c,c]));
+ if(k=='subject')return chips('subject',SUBJ.map(s=>[s,s]));
+ if(k=='term')return chips('term',[['1','Term 1'],['2','Term 2'],['3','Term 3']]);
+ if(k=='year')return chips('year',['2026','2025','2024'].map(y=>[y,y]));
+ if(k=='etype')return chips('etype',['Opener','Mid-term','End-term'].map(y=>[y,y]));
+ if(k=='topics'){const l=tl();if(!l.length)return '<p class="hint">No topics are loaded for this subject in the demo. In production they come from your curriculum database.</p>';
+  return all('topics')+l.map(t=>`<div class="tp">${cb('topics',t.n,t.n)}<span class="hint">${t.s.length} subtopics</span></div>`).join('')}
+ if(k=='subs')return all('subs')+A.topics.map(n=>{const t=tl().find(x=>x.n==n);return `<div class="tp"><b>${esc(n)}</b><div class="subs">${t.s.map(s=>cb('subs',n+'|'+s,s)).join('')}</div></div>`}).join('');
+ if(k=='cfg'){const c=A.cfg,o=(a,v)=>a.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('');
+  return `<div class="row"><label>Questions <select data-c="n">${o([10,20,40],c.n)}</select></label><label>Difficulty <select data-c="d">${o(['Easy','Mixed','Hard'],c.d)}</select></label></div>`+(A.role=='L'?'<p class="hint">Marked by AI as soon as you submit. You get a score and feedback on each question.</p>':`<label class="cb"><input type="checkbox" data-c="ms" ${c.ms?'checked':''}> Include marking scheme (printable)</label>`)}
+ if(k=='upload')return `<input type="file" accept=".csv,.xlsx" data-u>`+(A.file?`<p class="hint">Selected: ${esc(A.file)}</p>`:'');
+ if(k=='aud')return chips('aud',['Parents','Learners','Parents and learners'].map(x=>[x,x]));
+ if(k=='cls2')return chips('cls2',['All classes'].concat(Object.keys(D.cbc),Object.keys(D.old)).map(x=>[x,x]));
+ if(k=='msg')return '<div class="chips">'+TPL.map((t,i)=>`<button class="chip" data-tpl="${i}">${t[0]}</button>`).join('')+`</div><textarea data-m rows="4" maxlength="480" placeholder="Type your message…">${esc(A.msg)}</textarea><div class="hint" id="cnt"></div>`;
+}
+
+function render(){
+ const f=document.activeElement.dataset.f,m=$('main');
+ $('#who').innerHTML=A.role?`<span class="badge">${RN[A.role]}</span><button class="ghost" data-out>Sign out</button>`:'';
+ if(!A.role){m.className='';m.innerHTML=LOGIN;return}
+ m.className='app';let h='';const st=steps();
+ for(let i=0;i<st.length;i++){const k=st[i];h+=`<div class="step"><div class="lbl"><span class="n">${i+1}</span>${lab(k)}<span class="hint">${HT[k]||''}</span></div>${body(k)}</div>`;if(!done(k))break}
+ m.innerHTML=`<section class="card">${h}</section><aside class="card" id="side"></aside>`;
+ side();cnt();
+ if(f){const n=$('[data-f="'+f+'"]');n&&n.focus()}
+}
+function cnt(){const c=$('#cnt');if(c){const n=A.msg.length;c.textContent=n+' characters · '+Math.ceil(n/160)+' SMS segment(s) per recipient'}}
+
+function rq(){const o={role:RN[A.role].toLowerCase()};
+ if(A.svc){o.service=A.svc;const M={cur:'curriculum',cls:'class',cls2:'class',subject:'subject',term:'term',year:'year',etype:'examType',aud:'audience'},st=steps();
+  st.forEach(k=>{if(M[k]&&A[k])o[M[k]]=k=='term'||k=='year'?+A[k]:A[k]});
+  if(A.topics.length)o.topics=A.topics;if(A.subs.length)o.subtopics=A.subs.map(x=>x.split('|')[1]);
+  if(st.includes('cfg'))Object.assign(o,{questions:A.cfg.n,difficulty:A.cfg.d},A.role=='L'?{aiMarking:true}:{markingScheme:A.cfg.ms});
+  if(A.file)o.file=A.file;if(A.svc=='sms'&&A.msg)o.message=A.msg.slice(0,40)+'…'}
+ return JSON.stringify(o,null,1)}
+
+function results(){
+ const u=A.subs.map(x=>x.split('|')),b=[A.cur&&CN[A.cur],A.cls,A.subject,A.term&&'Term '+A.term].filter(Boolean).join(' · '),T=A.topics.join(', ');
+ const m={notes:()=>u.map(([a,s])=>[s,a+' · '+b]),
+ ainotes:()=>u.map(([a,s])=>['AI notes: '+s,a+' · '+b]),
+ lesson:()=>u.map(([a,s])=>['Lesson plan: '+s,a+' · '+b+' · '+A.year]),
+ scheme:()=>[['Scheme of work, Term '+A.term+' '+A.year,b+' · '+T]],
+ exams:()=>[[A.etype+' exam '+A.year,b+' · '+T]],
+ marking:()=>[[A.etype+' marking scheme '+A.year,b+' · '+T]],
+ aiquiz:()=>[['AI quiz · '+A.cfg.n+' questions',b+' · '+T]],
+ aiexam:()=>[['AI '+A.etype+' exam · '+A.cfg.n+' questions'+(A.cfg.ms?' + marking scheme':''),b+' · '+T]],
+ analysis:()=>[['Analysis of '+A.file,b+' · '+A.etype+' '+A.year]],
+ sms:()=>[['SMS to '+A.aud.toLowerCase()+' · '+A.cls2,A.msg.slice(0,70)]]}[A.svc]();
+ const act=svc().t.includes('AI')?'Generate':A.svc=='analysis'?'Run analysis':A.svc=='sms'?'Send SMS':'Download PDF';
+ return '<p class="hint" style="margin:16px 0 0">Sample results (replace with your API response)</p>'+m.slice(0,6).map(c=>`<div class="res"><div><b>${esc(c[0])}</b><div class="hint">${esc(c[1])}</div></div><button class="cta" data-act>${act}</button></div>`).join('')+(m.length>6?`<p class="hint">+${m.length-6} more</p>`:'');
+}
+function side(){
+ const cr=[RN[A.role],A.svc&&svc().n,A.cur&&CN[A.cur],A.cls,A.subject,A.term&&'Term '+A.term,A.year,A.etype,A.aud,A.cls2].filter(Boolean);
+ $('#side').innerHTML=`<h2>Your selection</h2><div class="crumbs">${cr.map(c=>`<span class="crumb">${esc(c)}</span>`).join('')}</div>
+ <p class="hint" style="margin:14px 0 0">Request sent to the server${A.svc?': <code>'+EP[A.svc]+'</code>':''}</p><pre>${esc(rq())}</pre>`+
+ (A.svc&&steps().every(done)?results():'<p class="hint" style="margin-top:14px">Complete every step to see matching resources.</p>');
+}
+function set(k,v){if(A[k]===v)return;const st=steps(),i=st.indexOf(k);
+ if(k=='svc'){const r=A.role;A=init();A.role=r}else st.slice(i+1).forEach(x=>{if(x in Z)A[x]=Array.isArray(Z[x])?[]:Z[x]});
+ A[k]=v;render()}
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tm);tm=setTimeout(()=>t.hidden=true,3500)}
+
+document.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+ if(d.role){A.role=d.role;render()}
+ else if('out' in d){A=init();render()}
+ else if(d.k)set(d.k,d.v);
+ else if(d.all){const l=tl();
+  if(d.all=='topics'){A.topics=A.topics.length==l.length?[]:l.map(x=>x.n);A.subs=A.subs.filter(x=>A.topics.includes(x.split('|')[0]))}
+  else{const a=A.topics.flatMap(n=>l.find(x=>x.n==n).s.map(s=>n+'|'+s));A.subs=A.subs.length==a.length?[]:a}
+  render()}
+ else if(d.tpl){A.msg=TPL[d.tpl][1];render()}
+ else if('act' in d)toast('Demo only: this button would call '+EP[A.svc]);
+});
+document.addEventListener('change',e=>{const t=e.target,d=t.dataset;
+ if(d.a){const a=A[d.a],i=a.indexOf(d.v);i<0?a.push(d.v):a.splice(i,1);if(d.a=='topics')A.subs=A.subs.filter(x=>A.topics.includes(x.split('|')[0]));render()}
+ else if(d.c){A.cfg[d.c]=t.type=='checkbox'?t.checked:d.c=='n'?+t.value:t.value;side()}
+ else if('u' in d){A.file=t.files[0]?t.files[0].name:null;render()}
+});
+document.addEventListener('input',e=>{if('m' in e.target.dataset){A.msg=e.target.value;cnt();side()}});
+
+const LOGIN=`<div class="card login"><h1>Sign in to Elimu Studio</h1><p class="hint" style="margin:0">Choose how you use the platform. Your account type decides which services you see.</p><div class="svcs">${[['L','Learner','Notes, exams, marking schemes and AI quizzes marked for you'],['T','Teacher','Notes, AI notes, schemes of work, lesson plans and AI exams'],['S','School','Everything teachers get, plus exam analysis and bulk SMS']].map(r=>`<button class="svc" data-role="${r[0]}"><b>${r[1]}</b><span>${r[2]}</span></button>`).join('')}</div><p class="hint" style="margin:0">Demo only. In production the role comes from the signed-in account on the server.</p></div>`;
+render();
+</script>
+</body>
+</html>
