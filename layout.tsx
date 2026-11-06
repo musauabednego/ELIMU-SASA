@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Masomo Sasa | Education Resources and AI Tools",
+  title: "Elimu Sasa | Education Resources and AI Tools",
   description:
     "Find curriculum-aligned teaching and learning resources for Kenyan classrooms, plus AI-powered tools for planning and assessments.",
 };
