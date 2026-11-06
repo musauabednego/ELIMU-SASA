@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const navigation = [
   { href: "/resources", label: "Resources" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/#teachers", label: "For teachers" },
   { href: "/#learners", label: "For learners" },
   { href: "/#how-it-works", label: "AI tools" },
@@ -13,10 +14,10 @@ export default function SiteHeader() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2 font-bold tracking-tight">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-xl text-white">
-            M
+            E
           </span>
           <span className="text-xl text-slate-900">
-            Masomo <span className="text-emerald-600">Sasa</span>
+            Elimu <span className="text-emerald-600">Sasa</span>
           </span>
         </Link>
 
